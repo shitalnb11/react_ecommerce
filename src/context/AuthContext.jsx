@@ -26,36 +26,36 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("users", JSON.stringify(users));
   };
 
-  // 🔹 LOGIN (ADMIN + USER)
   const login = (email, password) => {
-    // 👑 ADMIN LOGIN
-    const admin = JSON.parse(localStorage.getItem("admin"));
 
-    if (
-      admin &&
-      admin.email === email &&
-      admin.password === password
-    ) {
-      setUser(admin);
-      localStorage.setItem("currentUser", JSON.stringify(admin));
-      return admin;
-    }
+  // 👑 ADMIN LOGIN (HARDCODED)
+  if (email === "admin" && password === "admin123") {
+    const adminUser = {
+      name: "Admin",
+      email: "admin",
+      role: "admin",
+    };
 
-    // 👤 USER LOGIN
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    setUser(adminUser);
+    localStorage.setItem("currentUser", JSON.stringify(adminUser));
+    return adminUser;
+  }
 
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
+  // 👤 USER LOGIN
+  const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem("currentUser", JSON.stringify(foundUser));
-      return foundUser;
-    }
+  const foundUser = users.find(
+    (u) => u.email === email && u.password === password
+  );
 
-    return null;
-  };
+  if (foundUser) {
+    setUser(foundUser);
+    localStorage.setItem("currentUser", JSON.stringify(foundUser));
+    return foundUser;
+  }
+
+  return null;
+};
 
   // 🔹 LOGOUT
   const logout = () => {
