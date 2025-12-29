@@ -12,7 +12,7 @@ import { OrderProvider } from "./context/OrderContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter basename="/react_ecommerce">
+    <BrowserRouter >
       <AuthProvider>
         <ProductProvider>
           <CartProvider>
