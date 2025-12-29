@@ -12,9 +12,11 @@ import Dashboard from "./pages/Dashboard";
 import ProductList from "./pages/ProductList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-
+import Profile from "./pages/Profile";
+ import Orders from "./pages/Orders";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
       <Header />
 
       <Routes>
+        {/* PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -30,14 +33,57 @@ function App() {
         <Route path="/product/:id" element={<Product />} />
         <Route path="/productDetails/:id" element={<ProductDetails />} />
 
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/product-list" element={<ProductList />} />
-
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/orders" element={<Orders />} />
+
+        {/* 🔐 USER ONLY */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 🔐 ADMIN ONLY */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute role="admin">
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/product-list"
+          element={
+            <ProtectedRoute role="admin">
+              <ProductList />
+            </ProtectedRoute>
+          }
+        />
+        
       </Routes>
 
       <Footer />

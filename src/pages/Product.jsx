@@ -2,6 +2,11 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
+// ✅ Import images
+import img1 from "../assets/img/1img.jpeg";
+import img3 from "../assets/img/3img.jpeg";
+import img4 from "../assets/img/4img.jpeg";
+
 const Product = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -11,21 +16,21 @@ const Product = () => {
     {
       id: 1,
       title: "Men's Stylish Jacket",
-      image: "/src/assets/img/1img.jpeg",
+      image: img1,
       price: 1299,
       details: "High-quality material, great for winter.",
     },
     {
       id: 2,
       title: "Women's Designer Handbag",
-      image: "/src/assets/img/4img.jpeg",
+      image: img4,
       price: 999,
       details: "Perfect for daily and festive use.",
     },
     {
       id: 3,
       title: "Smart Fitness Watch",
-      image: "/src/assets/img/3img.jpeg",
+      image: img3,
       price: 1799,
       details: "Tracks heart rate, steps, sleep, and more.",
     },
@@ -38,8 +43,8 @@ const Product = () => {
   }
 
   const handleAdd = () => {
-    addToCart(product);   // Cart मध्ये add होईल
-    navigate("/cart");    // Cart page ला जाणार
+    addToCart(product);
+    navigate("/cart");
   };
 
   return (
@@ -47,7 +52,11 @@ const Product = () => {
       <div className="row align-items-center">
 
         <div className="col-md-6">
-          <img src={product.image} className="img-fluid rounded shadow" />
+          <img
+            src={product.image}
+            className="img-fluid rounded shadow"
+            alt={product.title}
+          />
         </div>
 
         <div className="col-md-6">

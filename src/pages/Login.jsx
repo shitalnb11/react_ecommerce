@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const { login } = useAuth();
@@ -10,11 +10,20 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (login(email, password)) {
-      alert("Login successful!");
+    const loggedInUser = login(email, password);
+
+    if (!loggedInUser) {
+      alert("Invalid credentials!");
+      return;
+    }
+
+    alert("Login successful!");
+
+    // ✅ ROLE BASED REDIRECT
+    if (loggedInUser.role === "admin") {
       navigate("/dashboard");
     } else {
-      alert("Invalid credentials!");
+      navigate("/products"); // ✅ CLIENT → PRODUCTS
     }
   };
 
@@ -39,12 +48,8 @@ export default function Login() {
         Login
       </button>
 
-      {/* SIGNUP LINK */}
       <p className="mt-3 text-center">
-        Don't have an account?{" "}
-        <Link to="/signup" style={{ color: "blue", textDecoration: "underline" }}>
-          Sign Up
-        </Link>
+        Don't have an account? <Link to="/signup">Sign Up</Link>
       </p>
     </div>
   );

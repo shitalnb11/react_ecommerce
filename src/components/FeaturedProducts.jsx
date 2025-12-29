@@ -1,10 +1,8 @@
+import { Link } from "react-router-dom";
+import { useProducts } from "../context/ProductContext";
+
 export default function FeaturedProducts() {
-  const products = [
-    { id: 1, title: "Blue Denim Jacket", price: 2999, image: "/src/assets/img/1img.jpeg" },
-    { id: 2, title: "White Sneakers", price: 2499, image: "/src/assets/img/2img.jpeg" },
-    { id: 3, title: "Classic Watch", price: 1999, image: "/src/assets/img/3img.jpeg" },
-    { id: 4, title: "Leather Handbag", price: 2499, image: "/src/assets/img/4img.jpeg" },
-  ];
+  const { products } = useProducts();
 
   return (
     <section className="products-section">
@@ -13,10 +11,13 @@ export default function FeaturedProducts() {
       <div className="product-grid">
         {products.map((p) => (
           <div className="product-card" key={p.id}>
-            <img src={p.image} className="prod-img" />
+            <img src={p.image} className="prod-img" alt={p.title} />
             <h3>{p.title}</h3>
             <p>₹{p.price}</p>
-            <a href={`/productDetails/${p.id}`} className="btn1">View Details</a>
+
+            <Link to={`/productDetails/${p.id}`} className="btn1">
+              View Details
+            </Link>
           </div>
         ))}
       </div>

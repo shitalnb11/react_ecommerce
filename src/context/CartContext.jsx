@@ -1,16 +1,26 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+
+  // ✅ Load cart from localStorage
+  const [cart, setCart] = useState(() => {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  });
+
+  // ✅ Save cart on every change
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   // ADD to Cart
   const addToCart = (product) => {
+    if (!product || !product.id) return;
+
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.id === product.id);
 
-      // Convert price to number
       const price = Number(
         typeof product.price === "string"
           ? product.price.replace("₹", "")
@@ -18,18 +28,18 @@ export const CartProvider = ({ children }) => {
       );
 
       if (existing) {
-        // Already in cart → increase qty
         return prevCart.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+          item.id === product.id
+            ? { ...item, qty: item.qty + 1 }
+            : item
         );
-      } else {
-        // New item → add qty = 1
-        return [...prevCart, { ...product, qty: 1, price }];
       }
+
+      return [...prevCart, { ...product, qty: 1, price }];
     });
   };
 
-  // REMOVE item
+  // REMOVE
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
@@ -42,12 +52,17 @@ export const CartProvider = ({ children }) => {
     }
 
     setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, qty } : item))
+      prev.map((item) =>
+        item.id === id ? { ...item, qty } : item
+      )
     );
   };
 
   // CLEAR CART
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  };
 
   return (
     <CartContext.Provider

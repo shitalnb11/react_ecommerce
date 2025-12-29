@@ -1,16 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useProducts } from "../context/ProductContext";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const { products } = useProducts();
+  const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // 🔹 Load products from localStorage
-  useEffect(() => {
-    const savedProducts = localStorage.getItem("products");
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
+  const handleAddToCart = (product) => {
+    if (!user) {
+      alert("Please login to add product to cart");
+      navigate("/login");
+      return;
     }
-  }, []);
+
+    addToCart(product);
+    alert("Product added to cart");
+  };
 
   return (
     <div className="container py-5">
@@ -24,7 +33,7 @@ const Products = () => {
             <div className="col-md-4 mb-4" key={item.id}>
               <div className="card shadow-sm h-100">
                 <img
-                  src={item.image}
+                  src={item.image || "https://via.placeholder.com/300"}
                   className="card-img-top"
                   alt={item.title}
                   style={{ height: "220px", objectFit: "cover" }}
@@ -35,11 +44,18 @@ const Products = () => {
                   <p className="text-success fw-bold">₹{item.price}</p>
 
                   <Link
-                    to={`/product/${item.id}`}
-                    className="btn btn-primary mt-auto w-100"
+                    to={`/productDetails/${item.id}`}
+                    className="btn btn-outline-primary mb-2 w-100"
                   >
                     View Details
                   </Link>
+
+                  <button
+                    className="btn1  mt-auto w-100"
+                    onClick={() => handleAddToCart(item)}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             </div>

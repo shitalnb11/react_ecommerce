@@ -29,33 +29,34 @@ export default function Signup() {
       <h2>Signup</h2>
 
       <input
-        className="form-control mt-2"
-        placeholder="Name"
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-      />
+  className="form-control mt-2"
+  placeholder="Enter your full name"
+  value={form.name}
+  onChange={(e) => setForm({ ...form, name: e.target.value })}
+/>
 
-      <input
-        className="form-control mt-2"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-      />
+<input
+  className="form-control mt-2"
+  type="email"
+  placeholder="Enter your email address"
+  value={form.email}
+  onChange={(e) => setForm({ ...form, email: e.target.value })}
+/>
 
-      <input
-        className="form-control mt-2"
-        type="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-      />
+<input
+  className="form-control mt-2"
+  type="password"
+  placeholder="Create a password"
+  value={form.password}
+  onChange={(e) => setForm({ ...form, password: e.target.value })}
+/>
 
-      <input
-        className="form-control mt-2"
-        placeholder="Address"
-        value={form.address}
-        onChange={(e) => setForm({ ...form, address: e.target.value })}
-      />
+<input
+  className="form-control mt-2"
+  placeholder="Enter your address"
+  value={form.address}
+  onChange={(e) => setForm({ ...form, address: e.target.value })}
+/>
 
       <button className="btn btn-primary mt-3 w-100" onClick={handleSubmit}>
         Signup

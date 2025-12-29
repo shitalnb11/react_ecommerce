@@ -1,40 +1,65 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // 🔹 Load user from localStorage on refresh
+  // 🔹 Load logged-in user
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) setUser(savedUser);
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      setUser(JSON.parse(currentUser));
+    }
   }, []);
 
-  // 🔹 Signup
+  // 🔹 SIGNUP (Normal User)
   const signup = (userData) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const newUser = {
+      ...userData,
+      role: "user",
+    };
+
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
   };
 
-  // 🔹 Login (FIXED + SAFE)
+  // 🔹 LOGIN (ADMIN + USER)
   const login = (email, password) => {
-    const saved = JSON.parse(localStorage.getItem("user"));
+    // 👑 ADMIN LOGIN
+    const admin = JSON.parse(localStorage.getItem("admin"));
 
-    if (!saved) return false;
-
-    if (saved.email === email && saved.password === password) {
-      setUser(saved);
-      localStorage.setItem("user", JSON.stringify(saved)); // ✅ persist login
-      return true;
+    if (
+      admin &&
+      admin.email === email &&
+      admin.password === password
+    ) {
+      setUser(admin);
+      localStorage.setItem("currentUser", JSON.stringify(admin));
+      return admin;
     }
 
-    return false;
+    // 👤 USER LOGIN
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const foundUser = users.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem("currentUser", JSON.stringify(foundUser));
+      return foundUser;
+    }
+
+    return null;
   };
 
-  // 🔹 Logout
+  // 🔹 LOGOUT
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
     setUser(null);
   };
 

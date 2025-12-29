@@ -1,5 +1,6 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import aboutImg from "../assets/img/about1.jpeg";
 
 const About = () => {
   return (
@@ -9,7 +10,7 @@ const About = () => {
         {/* LEFT FULL IMAGE */}
         <div className="col-md-6">
           <img
-            src="/src/assets/img/about1.jpeg"
+            src={aboutImg}
             className="img-fluid rounded shadow w-100"
             style={{ height: "350px", objectFit: "cover" }}
             alt="About Mumbaishopper"

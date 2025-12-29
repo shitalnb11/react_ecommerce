@@ -1,79 +1,64 @@
-import React from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useProducts } from "../context/ProductContext";
 import { useCart } from "../context/CartContext";
 
-const ProductDetails = () => {
+export default function ProductDetails() {
   const { id } = useParams();
-  const { addToCart } = useCart();
   const navigate = useNavigate();
+  const { products } = useProducts();
+  const { addToCart } = useCart();
 
-  const products = [
-    {
-      id: 1,
-      title: "Men's Stylish Jacket",
-      image: "/src/assets/img/1img.jpeg",
-      price: "₹1299",
-      details: "Premium winter jacket made with high-quality wool and leather."
-    },
-    {
-      id: 2,
-      title: "Women's Designer Handbag",
-      image: "/src/assets/img/4img.jpeg",
-      price: "₹999",
-      details: "Elegant and durable handbag perfect for daily use."
-    },
-    {
-      id: 3,
-      title: "Smart Fitness Watch",
-      image: "/src/assets/img/3img.jpeg",
-      price: "₹1799",
-      details: "Advanced activity tracker with heart rate, sleep & step monitor."
-    }
-  ];
-
-  const product = products.find((p) => p.id === Number(id));
+  const product = products.find((p) => String(p.id) === String(id));
 
   if (!product) {
-    return <h2 className="text-center py-5">❌ Product Not Found</h2>;
+    return (
+      <div className="container mt-5 text-center">
+        <h3>Product not found</h3>
+        <button className="btn btn-secondary" onClick={() => navigate("/products")}>
+          Back
+        </button>
+      </div>
+    );
   }
 
-  const handleAddToCart = () => {
-    addToCart(product);
-    navigate("/cart"); // redirect to cart page
-  };
-
   return (
-    <div className="container py-5">
-      <div className="row align-items-center">
-
-        {/* Left Image */}
-        <div className="col-md-6">
-          <img src={product.image} className="img-fluid rounded shadow" alt="" />
+    <div className="container mt-4">
+      <div className="row">
+        {/* Image Column */}
+        <div className="col-md-6" style={{ position: "relative", zIndex: 1 }}>
+          <img
+            src={product.image}
+            className="img-fluid"
+            alt={product.title}
+            style={{ pointerEvents: "none" }} // 🔹 ensures image doesn't block clicks
+          />
         </div>
 
-        {/* Right Content */}
-        <div className="col-md-6">
-          <h2 className="fw-bold">{product.title}</h2>
-          <h4 className="text-success mt-2">{product.price}</h4>
-          <p className="mt-3">{product.details}</p>
+        {/* Details Column */}
+        <div className="col-md-6" style={{ position: "relative", zIndex: 2 }}>
+          <h2>{product.title}</h2>
+          <h4 className="text-success">₹{product.price}</h4>
+          <p>{product.details}</p>
 
+          {/* Add to Cart Button */}
           <button
-            className="btn btn-warning px-4 mt-3"
-            onClick={handleAddToCart}
+            className="btn btn-warning me-2 mb-2"
+            style={{ position: "relative", zIndex: 10 }}
+            onClick={() => {
+              console.log("CLICKED:", product);
+              addToCart(product);
+              navigate("/cart"); // optional, remove if you don't want auto navigation
+            }}
           >
             Add to Cart
           </button>
 
-          <br /><br />
-
-          <Link to="/products" className="btn btn-secondary">
-            ⬅ Back to Products
-          </Link>
+          {/* Back Button */}
+          <button className="btn btn-secondary" onClick={() => navigate("/")}>
+            Back
+          </button>
         </div>
-
       </div>
     </div>
   );
-};
-
-export default ProductDetails;
+}
