@@ -39,7 +39,7 @@ export default function Header() {
          <Link to="/checkout" onClick={() => setMenuOpen(false)}>Checkout</Link>
 
         {user?.role === "admin" && (
-          <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+          <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
         )}
 
         {!user ? (

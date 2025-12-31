@@ -9,14 +9,22 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Dashboard from "./pages/Dashboard";
-import ProductList from "./pages/ProductList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
- import Orders from "./pages/Orders";
+import Orders from "./pages/Orders"; 
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+import UserDashboard from "./pages/UserDashboard";
+
+// ADMIN
+import AdminLayout from "./components/AdminLayout";
+import AdminProducts from "./pages/AdminProducts";
+import AdminOrders from "./pages/AdminOrders";
+import AdminUsers from "./pages/AdminUsers";
 
 function App() {
   return (
@@ -24,20 +32,17 @@ function App() {
       <Header />
 
       <Routes>
-        {/* PUBLIC ROUTES */}
+        {/* PUBLIC */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<Product />} />
         <Route path="/productDetails/:id" element={<ProductDetails />} />
-
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/orders" element={<Orders />} />
 
-        {/* 🔐 USER ONLY */}
+        {/* USER */}
         <Route
           path="/profile"
           element={
@@ -65,25 +70,38 @@ function App() {
           }
         />
 
-        {/* 🔐 ADMIN ONLY */}
         <Route
-          path="/dashboard"
+          path="/user/dashboard"
           element={
-            <ProtectedRoute role="admin">
-              <Dashboard />
+            <ProtectedRoute role="user">
+              <UserDashboard />
             </ProtectedRoute>
           }
         />
 
+        {/* 🔐 ADMIN LAYOUT + CHILD ROUTES */}
         <Route
-          path="/product-list"
+          path="/admin"
           element={
             <ProtectedRoute role="admin">
-              <ProductList />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
-        
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
+        <Route
+  path="/orders"
+  element={
+    <ProtectedRoute>
+      <Orders />
+    </ProtectedRoute>
+  }
+/>
+
       </Routes>
 
       <Footer />

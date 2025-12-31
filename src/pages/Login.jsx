@@ -21,7 +21,7 @@ export default function Login() {
 
     // ✅ ROLE BASED REDIRECT
     if (loggedInUser.role === "admin") {
-      navigate("/dashboard");
+      navigate("/admin/dashboard");
     } else {
       navigate("/products"); // ✅ CLIENT → PRODUCTS
     }
