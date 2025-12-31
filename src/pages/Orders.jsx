@@ -1,104 +1,86 @@
 import { useOrders } from "../context/OrderContext";
-import { useAuth } from "../context/AuthContext";
-import { FaTrash, FaCheck } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Orders() {
   const { orders, deleteOrder, markDelivered } = useOrders();
-  const { user } = useAuth();
-
-  const userOrders =
-    user?.role === "admin"
-      ? orders
-      : orders.filter(
-          (o) =>
-            o.userEmail?.toLowerCase() ===
-            user?.email?.toLowerCase()
-        );
 
   return (
-    <div className="container my-5">
-      <h2 className="text-center mb-4">
-        {user?.role === "admin" ? "All Orders" : "My Orders"}
-      </h2>
+    <div className="d-flex min-vh-100 bg-light">
+      <main className="flex-grow-1 p-4">
 
-      {userOrders.length === 0 ? (
-        <div className="alert alert-info text-center">
-          No orders found
-        </div>
-      ) : (
-        <table className="table table-bordered table-hover">
-          <thead className="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Order ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Products</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        <h3 className="mb-4">All Orders</h3>
 
-          <tbody>
-            {userOrders.map((order, i) => (
-              <tr key={order.id}>
-                <td>{i + 1}</td>
-                <td>{order.id}</td>
-                <td>{order.customerName}</td>
-                <td>{order.userEmail}</td>
+        {orders.length === 0 && <p>No orders yet</p>}
 
-                <td>
-                  {order.products.map((p, idx) => (
-                    <div key={idx}>
-                      {p.title} × {p.quantity}
-                    </div>
-                  ))}
-                </td>
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover align-middle bg-white">
+            <thead className="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Customer Name</th>
+                <th>Products</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-                <td>₹{order.total}</td>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
 
-                <td>
-                  <span
-                    className={`badge ${
-                      order.status === "Delivered"
-                        ? "bg-success"
-                        : "bg-warning text-dark"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
+                  {/* ✅ FIXED */}
+                  <td>{order.userName}</td>
 
-                <td>
-                  {new Date(order.date).toLocaleDateString()}
-                </td>
+                  <td>
+                    {order.products.map((p, i) => (
+                      <div key={i}>
+                        {p.title} × {p.quantity}
+                      </div>
+                    ))}
+                  </td>
 
-                <td className="d-flex gap-2">
-                  {user?.role === "admin" && (
+                  <td className="fw-bold">₹{order.total}</td>
+
+                  <td>
+                    <span
+                      className={`badge ${
+                        order.status === "Delivered"
+                          ? "bg-success"
+                          : "bg-warning text-dark"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+
+                  <td>{order.date}</td>
+
+                  <td>
                     <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => markDelivered(order.id)}
+                      className="btn btn-sm btn-success me-2"
+                      onClick={() => markDelivered(index)}
                       disabled={order.status === "Delivered"}
                     >
-                      <FaCheck />
+                      Delivered
                     </button>
-                  )}
 
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => deleteOrder(order.id)}
-                  >
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => deleteOrder(index)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      </main>
     </div>
   );
 }

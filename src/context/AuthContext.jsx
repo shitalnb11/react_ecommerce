@@ -29,10 +29,10 @@ export const AuthProvider = ({ children }) => {
   const login = (email, password) => {
 
   // 👑 ADMIN LOGIN (HARDCODED)
-  if (email === "admin" && password === "admin123") {
+  if (email === "admin@gmail.com" && password === "admin123") {
     const adminUser = {
       name: "Admin",
-      email: "admin",
+      email: "admin@gmail.com",
       role: "admin",
     };
 

@@ -31,8 +31,10 @@ export default function Checkout() {
       return;
     }
 
+    // ✅ CORRECT ORDER DATA
     const orderData = {
-      customerName: user.name,
+      userName: user.name || user.username, // 🔥 FIX
+      username: user.username,
       phone: form.phone,
       address: form.address,
       products: cart.map((item) => ({
@@ -40,9 +42,11 @@ export default function Checkout() {
         quantity: item.qty,
       })),
       total,
+      status: "Placed",
+      date: new Date().toLocaleString(),
     };
 
-    addOrder(orderData, user.email); // 🔥 IMPORTANT FIX
+    addOrder(orderData); // ✅ email काढून टाकला
     clearCart();
     alert("Order placed successfully!");
   };
@@ -59,15 +63,15 @@ export default function Checkout() {
 
             <input
               className="form-control mb-3"
-              value={user?.name}
+              value={user?.name || user?.username}
               disabled
             />
 
-            <input
+            {/* <input
               className="form-control mb-3"
-              value={user?.email}
+              value={user?.username}
               disabled
-            />
+            /> */}
 
             <input
               className="form-control mb-3"
