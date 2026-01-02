@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -12,12 +13,12 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
-import Orders from "./pages/Orders"; 
+import Orders from "./pages/Orders";
+import Wishlist from "./pages/Wishlist";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 import UserDashboard from "./pages/UserDashboard";
 
 // ADMIN
@@ -29,6 +30,9 @@ import AdminUsers from "./pages/AdminUsers";
 function App() {
   return (
     <>
+      {/* 🔔 TOAST NOTIFICATIONS */}
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+
       <Header />
 
       <Routes>
@@ -79,7 +83,25 @@ function App() {
           }
         />
 
-        {/* 🔐 ADMIN LAYOUT + CHILD ROUTES */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -93,15 +115,6 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
-        <Route
-  path="/orders"
-  element={
-    <ProtectedRoute>
-      <Orders />
-    </ProtectedRoute>
-  }
-/>
-
       </Routes>
 
       <Footer />

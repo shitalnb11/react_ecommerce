@@ -9,15 +9,21 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
+import { WishlistProvider } from "./context/WishlistContext";
+import { ReviewProvider } from "./hooks/useReview.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter >
+    <BrowserRouter>
       <AuthProvider>
         <ProductProvider>
           <CartProvider>
             <OrderProvider>
-              <App />
+              <WishlistProvider>
+                <ReviewProvider> {/* Wrap App with ReviewProvider */}
+                  <App />
+                </ReviewProvider>
+              </WishlistProvider>
             </OrderProvider>
           </CartProvider>
         </ProductProvider>
