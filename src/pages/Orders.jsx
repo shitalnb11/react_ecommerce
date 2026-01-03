@@ -1,48 +1,71 @@
+// Orders.jsx
 import { useOrders } from "../context/OrderContext";
+import { useAuth } from "../context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Orders() {
   const { orders, deleteOrder, markDelivered } = useOrders();
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  const isAdmin = user.role === "admin";
+
+  const visibleOrders = isAdmin
+    ? orders
+    : orders.filter((o) => {
+        const orderEmail = o.userEmail || o.email || "";
+        const userEmail = user.email || "";
+        return orderEmail.toLowerCase() === userEmail.toLowerCase();
+      });
 
   return (
-    <div className="d-flex min-vh-100 bg-light">
-      <main className="flex-grow-1 p-4">
+    <div className="container mt-4">
+      <h3 className="mb-4">{isAdmin ? "All Orders" : "My Orders"}</h3>
 
-        <h3 className="mb-4">All Orders</h3>
+      {visibleOrders.length === 0 && (
+        <div className="alert alert-info">No orders found</div>
+      )}
 
-        {orders.length === 0 && <p>No orders yet</p>}
-
+      {visibleOrders.length > 0 && (
         <div className="table-responsive">
           <table className="table table-bordered table-hover align-middle bg-white">
             <thead className="table-dark">
               <tr>
                 <th>#</th>
-                <th>Customer Name</th>
+                {isAdmin && <th>User</th>}
                 <th>Products</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th>Date</th>
-                <th>Action</th>
+                {isAdmin && <th>Action</th>}
               </tr>
             </thead>
 
             <tbody>
-              {orders.map((order, index) => (
-                <tr key={index}>
+              {visibleOrders.map((order, index) => (
+                <tr key={order.id}>
                   <td>{index + 1}</td>
 
-                  {/* ✅ FIXED */}
-                  <td>{order.userName}</td>
+                  {isAdmin && (
+                    <td>
+                      {order.userName || "N/A"}
+                      <br />
+                      <small className="text-muted">
+                        {order.userEmail || order.email || "N/A"}
+                      </small>
+                    </td>
+                  )}
 
                   <td>
-                    {order.products.map((p, i) => (
-                      <div key={i}>
+                    {order.products?.map((p) => (
+                      <div key={p.id || p.title}>
                         {p.title} × {p.quantity}
                       </div>
-                    ))}
+                    )) || "No products"}
                   </td>
 
-                  <td className="fw-bold">₹{order.total}</td>
+                  <td className="fw-bold">₹{order.total || 0}</td>
 
                   <td>
                     <span
@@ -52,35 +75,40 @@ export default function Orders() {
                           : "bg-warning text-dark"
                       }`}
                     >
-                      {order.status}
+                      {order.status || "Pending"}
                     </span>
                   </td>
 
-                  <td>{order.date}</td>
-
                   <td>
-                    <button
-                      className="btn btn-sm btn-success me-2"
-                      onClick={() => markDelivered(index)}
-                      disabled={order.status === "Delivered"}
-                    >
-                      Delivered
-                    </button>
-
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => deleteOrder(index)}
-                    >
-                      Delete
-                    </button>
+                    {order.date
+                      ? new Date(order.date).toLocaleDateString()
+                      : "N/A"}
                   </td>
+
+                  {isAdmin && (
+                    <td>
+                      <button
+                        className="btn btn-sm btn-success me-2"
+                        onClick={() => markDelivered(order.id)}
+                        disabled={order.status === "Delivered"}
+                      >
+                        Delivered
+                      </button>
+
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => deleteOrder(order.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
-      </main>
+      )}
     </div>
   );
 }

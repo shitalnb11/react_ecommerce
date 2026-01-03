@@ -1,6 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+// App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
+// Pages
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -15,24 +17,23 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Wishlist from "./pages/Wishlist";
-
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
 import UserDashboard from "./pages/UserDashboard";
 
-// ADMIN
+// Admin
 import AdminLayout from "./components/AdminLayout";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminUsers from "./pages/AdminUsers";
 
+// Components
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <>
-      {/* 🔔 TOAST NOTIFICATIONS */}
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-
       <Header />
 
       <Routes>
@@ -55,34 +56,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/user/dashboard"
-          element={
-            <ProtectedRoute role="user">
-              <UserDashboard />
-            </ProtectedRoute>
-          }
-        />
-
         <Route
           path="/orders"
           element={
@@ -91,12 +64,35 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/wishlist"
           element={
             <ProtectedRoute>
               <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/dashboard"
+          element={
+            <ProtectedRoute role="user">
+              <UserDashboard />
             </ProtectedRoute>
           }
         />
@@ -115,6 +111,9 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
+
+        {/* Redirect unknown routes */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
       <Footer />

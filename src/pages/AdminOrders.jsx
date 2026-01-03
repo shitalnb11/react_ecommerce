@@ -1,61 +1,102 @@
+import { useOrders } from "../context/OrderContext";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 export default function AdminOrders() {
-  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const { orders, deleteOrder, markDelivered } = useOrders();
 
   return (
-    <div className="p-3">
-      <h3 className="mb-3">All Orders</h3>
+    <div className="container-fluid p-4">
+      <h3 className="mb-4">All Orders</h3>
 
-      {orders.length === 0 ? (
-        <p>No orders found.</p>
-      ) : (
-        <>
-          {/* DESKTOP & TABLET VIEW */}
-          <div className="table-responsive d-none d-md-block">
-            <table className="table table-striped table-bordered">
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Customer</th>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Total</th>
-                  <th>Status</th>
+      {orders.length === 0 && (
+        <div className="alert alert-info">
+          No orders available
+        </div>
+      )}
+
+      {orders.length > 0 && (
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover align-middle bg-white">
+            <thead className="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={order.id}>
+                  <td>{index + 1}</td>
+
+                  {/* CUSTOMER */}
+                  <td>
+                    <strong>{order.userName}</strong>
+                    <br />
+                    <small className="text-muted">
+                      {order.userEmail}
+                    </small>
+                  </td>
+
+                  {/* PRODUCTS */}
+                  <td>
+                    {order.products.map((p, i) => (
+                      <div key={i}>{p.title}</div>
+                    ))}
+                  </td>
+
+                  {/* QUANTITY */}
+                  <td>
+                    {order.products.map((p, i) => (
+                      <div key={i}>{p.quantity}</div>
+                    ))}
+                  </td>
+
+                  {/* TOTAL */}
+                  <td className="fw-bold">
+                    ₹{order.total}
+                  </td>
+
+                  {/* STATUS */}
+                  <td>
+                    <span
+                      className={`badge ${
+                        order.status === "Delivered"
+                          ? "bg-success"
+                          : "bg-warning text-dark"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+
+                  {/* ACTION */}
+                  <td>
+                    <button
+                      className="btn btn-sm btn-success me-2"
+                      onClick={() => markDelivered(order.id)}
+                      disabled={order.status === "Delivered"}
+                    >
+                      Delivered
+                    </button>
+
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => deleteOrder(order.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {orders.map((order, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{order.customerName}</td>
-                    <td>{order.productName}</td>
-                    <td>{order.quantity}</td>
-                    <td>₹{order.totalPrice}</td>
-                    <td>{order.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* MOBILE VIEW */}
-          <div className="d-md-none">
-            {orders.map((order, index) => (
-              <div className="order-card mb-3" key={index}>
-                <div><strong>#</strong> {index + 1}</div>
-                <div><strong>Customer:</strong> {order.customerName}</div>
-                <div><strong>Product:</strong> {order.productName}</div>
-                <div><strong>Qty:</strong> {order.quantity}</div>
-                <div><strong>Total:</strong> ₹{order.totalPrice}</div>
-                <div>
-                  <strong>Status:</strong>{" "}
-                  <span className="badge bg-success">
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

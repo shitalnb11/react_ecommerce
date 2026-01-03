@@ -1,5 +1,6 @@
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useOrders } from "../context/OrderContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
@@ -10,36 +11,57 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export default function Checkout() {
   const { cart, clearCart, updateQuantity } = useCart();
   const { user } = useAuth();
+  const { addOrder } = useOrders();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.qty,
+    0
+  );
 
-  // Simulate page loading
+  // Fake loading
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ PLACE ORDER
   const handlePlaceOrder = () => {
     if (cart.length === 0) {
       toast.error("Your cart is empty!");
       return;
     }
+
     if (!address.trim()) {
       toast.error("Please enter delivery address");
       return;
     }
 
-    // ✅ Dummy order success
+    // ✅ SAVE ORDER
+    addOrder(
+      {
+        products: cart.map((item) => ({
+          title: item.title,
+          quantity: item.qty,
+          price: item.price,
+        })),
+        total,
+        address,
+      },
+      user?.email || "guest@email.com",
+      user?.name || user?.username || "Guest User"
+    );
+
     toast.success("Order placed successfully 🎉");
 
     clearCart();
     navigate("/orders");
   };
 
+  // LOADING STATE
   if (loading) {
     return (
       <div className="container mt-4">
@@ -56,6 +78,7 @@ export default function Checkout() {
     );
   }
 
+  // EMPTY CART
   if (cart.length === 0) {
     return (
       <div className="text-center mt-5">
@@ -89,7 +112,10 @@ export default function Checkout() {
             />
 
             <p className="text-muted mt-2">
-              Logged in as <strong>{user?.name || user?.username}</strong>
+              Logged in as{" "}
+              <strong>
+                {user?.name || user?.username || "Guest"}
+              </strong>
             </p>
           </div>
         </div>
@@ -108,21 +134,30 @@ export default function Checkout() {
                 <span>
                   {item.title} × {item.qty}
                 </span>
+
                 <div className="d-flex align-items-center gap-2">
                   <strong>₹{item.price * item.qty}</strong>
+
                   <div>
                     <button
                       className="btn btn-sm btn-outline-secondary"
                       onClick={() =>
-                        updateQuantity(item.id, Math.max(item.qty - 1, 1))
+                        updateQuantity(
+                          item.id,
+                          Math.max(item.qty - 1, 1)
+                        )
                       }
                     >
                       -
                     </button>
+
                     <span className="mx-2">{item.qty}</span>
+
                     <button
                       className="btn btn-sm btn-outline-secondary"
-                      onClick={() => updateQuantity(item.id, item.qty + 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, item.qty + 1)
+                      }
                     >
                       +
                     </button>
@@ -146,11 +181,9 @@ export default function Checkout() {
               Place Order
             </button>
 
-            {/* PAYMENT PLACEHOLDER */}
             <button
               className="btn btn-outline-primary w-100 mt-2"
               disabled
-              title="Razorpay / Stripe integration coming soon"
             >
               Pay with Card (Coming Soon)
             </button>

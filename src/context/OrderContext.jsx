@@ -5,18 +5,19 @@ const OrderContext = createContext();
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
 
-  // Load orders
+  // Load orders from localStorage
   useEffect(() => {
     const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
     setOrders(storedOrders);
   }, []);
 
-  // ✅ Add Order
-  const addOrder = (order, userEmail) => {
+  // Add Order
+  const addOrder = (order, userEmail, userName) => {
     const newOrder = {
       ...order,
       id: Date.now(),
       userEmail,
+      userName,
       status: "Pending",
       date: new Date().toISOString(),
     };
@@ -33,7 +34,7 @@ export const OrderProvider = ({ children }) => {
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
   };
 
-  // Admin → Mark Delivered
+  // Mark Delivered
   const markDelivered = (id) => {
     const updatedOrders = orders.map((o) =>
       o.id === id ? { ...o, status: "Delivered" } : o
