@@ -24,6 +24,7 @@ import AdminLayout from "./components/AdminLayout";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminUsers from "./pages/AdminUsers";
+import EditProduct from "./pages/EditProduct";
 
 // Components
 import Header from "./components/Header";
@@ -46,6 +47,8 @@ function App() {
         <Route path="/productDetails/:id" element={<ProductDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/admin/products/edit/:id" element={<EditProduct />} />
+
 
         {/* USER */}
         <Route

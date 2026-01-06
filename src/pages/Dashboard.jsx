@@ -1,16 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useProducts } from "../context/ProductContext";
-import { useAuth } from "../context/AuthContext";
-import { FaBox, FaShoppingCart, FaUsers, FaSignOutAlt } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Dashboard() {
-  const { addProduct, deleteProduct, products } = useProducts();
-  const { user, logout } = useAuth();
+const Dashboard = () => {
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
 
-  const users = JSON.parse(localStorage.getItem("users")) || [];
-  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const scrollRef = useRef(null);
 
+  const [editingProduct, setEditingProduct] = useState(null);
   const [form, setForm] = useState({
     title: "",
     price: "",
@@ -18,159 +14,150 @@ export default function Dashboard() {
     details: "",
   });
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
+  // 🔹 Add / Update Product
   const handleSubmit = (e) => {
     e.preventDefault();
-    addProduct(form);
+
+    if (editingProduct) {
+      // ✅ Update Product via context
+      updateProduct(editingProduct.id, {
+        ...form,
+        price: Number(form.price),
+      });
+    } else {
+      // ✅ Add new product
+      addProduct({
+        ...form,
+        price: Number(form.price),
+      });
+    }
+
+    // Clear form
     setForm({ title: "", price: "", image: "", details: "" });
+    setEditingProduct(null);
   };
 
   return (
-    <div className="d-flex flex-column bg-light vh-100 overflow-hidden">
-
-      {/* Header */}
-      <header className="d-flex justify-content-between align-items-center bg-primary text-white px-3 py-3 shadow-sm">
-        <h4 className="m-0 fs-5">Admin Dashboard</h4>
-        <div className="d-flex align-items-center gap-2">
-          <span className="d-none d-sm-inline">Welcome, {user?.name}</span>
-          {/* <button
-            className="btn btn-outline-light btn-sm d-flex align-items-center gap-1"
-            onClick={logout}
-          >
-            <FaSignOutAlt /> Logout
-          </button> */}
-        </div>
+    <div className="d-flex flex-column vh-100 bg-light overflow-hidden">
+      {/* HEADER */}
+      <header className="bg-dark text-white p-3">
+        <h4 className="m-0">Admin Dashboard</h4>
       </header>
 
-      {/* Scrollable Content */}
-      <div className="flex-grow-1 overflow-y-auto p-3 p-md-4">
-
-        {/* Stats Cards */}
-        <div className="row g-3 mb-4">
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-start border-4 border-primary p-3 text-center h-100">
-              <FaBox size={30} className="text-primary mb-2" />
-              <h6>Total Products</h6>
-              <h3 className="fw-bold">{products.length}</h3>
-            </div>
-          </div>
-
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-start border-4 border-warning p-3 text-center h-100">
-              <FaShoppingCart size={30} className="text-warning mb-2" />
-              <h6>Total Orders</h6>
-              <h3 className="fw-bold">{orders.length}</h3>
-            </div>
-          </div>
-
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-start border-4 border-success p-3 text-center h-100">
-              <FaUsers size={30} className="text-success mb-2" />
-              <h6>Total Users</h6>
-              <h3 className="fw-bold">{users.length}</h3>
-            </div>
-          </div>
-        </div>
-
-        {/* Add Product */}
-        <div className="card shadow-sm mb-4">
-          <div className="card-header fw-semibold bg-white">
-            Add New Product
-          </div>
+      {/* SCROLLABLE CONTENT */}
+      <div ref={scrollRef} className="flex-grow-1 overflow-y-auto p-3 p-md-4">
+        {/* FORM */}
+        <div className="card mb-4">
           <div className="card-body">
+            <h5>{editingProduct ? "Edit Product" : "Add Product"}</h5>
+
             <form onSubmit={handleSubmit}>
-              <div className="row g-3">
-                <div className="col-12 col-md-6">
-                  <input
-                    type="text"
-                    name="title"
-                    className="form-control"
-                    placeholder="Product Title"
-                    value={form.title}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+              <input
+                className="form-control mb-2"
+                placeholder="Title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+              />
 
-                <div className="col-12 col-md-6">
-                  <input
-                    type="number"
-                    name="price"
-                    className="form-control"
-                    placeholder="Price"
-                    value={form.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+              <input
+                className="form-control mb-2"
+                type="number"
+                placeholder="Price"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                required
+              />
 
-                <div className="col-12 col-md-6">
-                  <input
-                    type="text"
-                    name="image"
-                    className="form-control"
-                    placeholder="Image URL"
-                    value={form.image}
-                    onChange={handleChange}
-                  />
-                </div>
+              <input
+                className="form-control mb-2"
+                placeholder="Image URL"
+                value={form.image}
+                onChange={(e) => setForm({ ...form, image: e.target.value })}
+              />
 
-                <div className="col-12 col-md-6">
-                  <input
-                    type="text"
-                    name="details"
-                    className="form-control"
-                    placeholder="Short Details"
-                    value={form.details}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+              <textarea
+                className="form-control mb-2"
+                placeholder="Details"
+                value={form.details}
+                onChange={(e) => setForm({ ...form, details: e.target.value })}
+              />
 
-              <button className="btn btn-primary mt-3 px-4">
-                Add Product
+              <button className="btn btn-success">
+                {editingProduct ? "Update Product" : "Add Product"}
               </button>
+
+              {editingProduct && (
+                <button
+                  type="button"
+                  className="btn btn-secondary ms-2"
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setForm({ title: "", price: "", image: "", details: "" });
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </form>
           </div>
         </div>
 
-        {/* Product List */}
-        <h5 className="mb-3 fw-semibold">Products List</h5>
-        <div className="row g-3">
-          {products.length === 0 && (
-            <p className="text-center">No products added yet</p>
-          )}
+        {/* PRODUCT LIST */}
+        <div className="row">
+          {products.length === 0 ? (
+            <p>No products found</p>
+          ) : (
+            products.map((p) => (
+              <div key={p.id} className="col-md-4 mb-3">
+                <div className="card h-100">
+                  <img
+                    src={p.image || "https://via.placeholder.com/300"}
+                    className="card-img-top"
+                    alt={p.title}
+                    style={{ height: 200, objectFit: "cover" }}
+                  />
 
-          {products.map((p) => (
-            <div className="col-12 col-md-6 col-lg-4" key={p.id}>
-              <div className="card shadow-sm h-100">
-                <img
-                  src={p.image || "https://via.placeholder.com/300"}
-                  className="card-img-top"
-                  alt={p.title}
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <div className="card-body d-flex flex-column">
-                  <h6 className="fw-semibold">{p.title}</h6>
-                  <p className="text-success fw-bold">₹{p.price}</p>
-                  <p className="small text-muted flex-grow-1">
-                    {p.details}
-                  </p>
-                  <button
-                    className="btn btn-danger btn-sm mt-2"
-                    onClick={() => deleteProduct(p.id)}
-                  >
-                    Delete Product
-                  </button>
+                  <div className="card-body">
+                    <h6>{p.title}</h6>
+                    <p>₹{p.price}</p>
+
+                    <button
+                      className="btn btn-warning btn-sm me-2"
+                      onClick={() => {
+                        setEditingProduct(p);
+                        setForm({
+                          title: p.title,
+                          price: p.price,
+                          image: p.image,
+                          details: p.details,
+                        });
+
+                        // Scroll to top
+                        scrollRef.current?.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => deleteProduct(p.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

@@ -45,14 +45,17 @@ export default function Profile() {
           </div>
 
           <div className="d-flex flex-column gap-3">
-            <Link
-              to="/orders"
-              className="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center gap-2"
-            >
-              <FaShoppingCart />
-              {isAdmin ? "All Orders" : "My Orders"}
-            </Link>
+            {/* Show My Orders only for regular users */}
+            {!isAdmin && (
+              <Link
+                to="/orders"
+                className="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center gap-2"
+              >
+                <FaShoppingCart /> My Orders
+              </Link>
+            )}
 
+            {/* Logout button is always visible */}
             <button
               className="btn btn-danger btn-lg d-flex align-items-center justify-content-center gap-2"
               onClick={logout}
@@ -65,3 +68,4 @@ export default function Profile() {
     </div>
   );
 }
+  

@@ -5,49 +5,30 @@ const OrderContext = createContext();
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
 
-  // Load orders from localStorage
   useEffect(() => {
     const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
     setOrders(storedOrders);
   }, []);
 
-  // Add Order
-  const addOrder = (order, userEmail, userName) => {
-    const newOrder = {
-      ...order,
-      id: Date.now(),
-      userEmail,
-      userName,
-      status: "Pending",
-      date: new Date().toISOString(),
-    };
+  const addOrder = (order) => {
+    // Create order ID if not exists
+    const newOrder = { ...order, id: Date.now() };
 
     const updatedOrders = [...orders, newOrder];
     setOrders(updatedOrders);
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
   };
 
-  // Delete Order
-  const deleteOrder = (id) => {
-    const updatedOrders = orders.filter((o) => o.id !== id);
-    setOrders(updatedOrders);
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
-  };
-
-  // Mark Delivered
   const markDelivered = (id) => {
     const updatedOrders = orders.map((o) =>
       o.id === id ? { ...o, status: "Delivered" } : o
     );
-
     setOrders(updatedOrders);
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
   };
 
   return (
-    <OrderContext.Provider
-      value={{ orders, addOrder, deleteOrder, markDelivered }}
-    >
+    <OrderContext.Provider value={{ orders, addOrder, markDelivered }}>
       {children}
     </OrderContext.Provider>
   );

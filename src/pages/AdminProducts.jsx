@@ -1,7 +1,9 @@
 import { useProducts } from "../context/ProductContext";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminProducts() {
   const { products, deleteProduct } = useProducts();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -15,7 +17,7 @@ export default function AdminProducts() {
             <th>#</th>
             <th>Title</th>
             <th>Price</th>
-            <th>Action</th>
+            <th style={{ width: "180px" }}>Action</th>
           </tr>
         </thead>
 
@@ -26,6 +28,13 @@ export default function AdminProducts() {
               <td>{p.title}</td>
               <td>₹{p.price}</td>
               <td>
+                <button
+                  className="btn btn-primary btn-sm me-2"
+                  onClick={() => navigate(`/admin/products/edit/${p.id}`)}
+                >
+                  Edit
+                </button>
+
                 <button
                   className="btn btn-danger btn-sm"
                   onClick={() => deleteProduct(p.id)}
