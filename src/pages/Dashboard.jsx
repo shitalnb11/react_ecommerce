@@ -1,8 +1,13 @@
 import { useRef, useState } from "react";
+import { FaBox, FaShoppingCart, FaUsers } from "react-icons/fa";
 import { useProducts } from "../context/ProductContext";
 
 const Dashboard = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+
+  // Orders & Users from localStorage
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const users = JSON.parse(localStorage.getItem("users")) || [];
 
   const scrollRef = useRef(null);
 
@@ -19,20 +24,17 @@ const Dashboard = () => {
     e.preventDefault();
 
     if (editingProduct) {
-      // ✅ Update Product via context
       updateProduct(editingProduct.id, {
         ...form,
         price: Number(form.price),
       });
     } else {
-      // ✅ Add new product
       addProduct({
         ...form,
         price: Number(form.price),
       });
     }
 
-    // Clear form
     setForm({ title: "", price: "", image: "", details: "" });
     setEditingProduct(null);
   };
@@ -40,12 +42,40 @@ const Dashboard = () => {
   return (
     <div className="d-flex flex-column vh-100 bg-light overflow-hidden">
       {/* HEADER */}
-      <header className="bg-dark text-white p-3">
+      <header className="bg-primary text-white p-3">
         <h4 className="m-0">Admin Dashboard</h4>
       </header>
 
       {/* SCROLLABLE CONTENT */}
-      <div ref={scrollRef} className="flex-grow-1 overflow-y-auto p-3 p-md-4">
+      <div ref={scrollRef} className="flex-grow-1 overflow-auto p-3 p-md-4">
+
+        {/* STATS CARDS */}
+        <div className="row g-3 mb-4">
+          <div className="col-12 col-md-4">
+            <div className="card shadow-sm border-start border-4 border-primary p-3 text-center h-100">
+              <FaBox size={30} className="text-primary mb-2" />
+              <h6>Total Products</h6>
+              <h3 className="fw-bold">{products.length}</h3>
+            </div>
+          </div>
+
+          <div className="col-12 col-md-4">
+            <div className="card shadow-sm border-start border-4 border-warning p-3 text-center h-100">
+              <FaShoppingCart size={30} className="text-warning mb-2" />
+              <h6>Total Orders</h6>
+              <h3 className="fw-bold">{orders.length}</h3>
+            </div>
+          </div>
+
+          <div className="col-12 col-md-4">
+            <div className="card shadow-sm border-start border-4 border-success p-3 text-center h-100">
+              <FaUsers size={30} className="text-success mb-2" />
+              <h6>Total Users</h6>
+              <h3 className="fw-bold">{users.length}</h3>
+            </div>
+          </div>
+        </div>
+
         {/* FORM */}
         <div className="card mb-4">
           <div className="card-body">
@@ -93,7 +123,12 @@ const Dashboard = () => {
                   className="btn btn-secondary ms-2"
                   onClick={() => {
                     setEditingProduct(null);
-                    setForm({ title: "", price: "", image: "", details: "" });
+                    setForm({
+                      title: "",
+                      price: "",
+                      image: "",
+                      details: "",
+                    });
                   }}
                 >
                   Cancel
@@ -120,7 +155,8 @@ const Dashboard = () => {
 
                   <div className="card-body">
                     <h6>{p.title}</h6>
-                    <p>₹{p.price}</p>
+                    <p className="fw-bold">₹{p.price}</p>
+                    <p className="small text-muted">{p.details}</p>
 
                     <button
                       className="btn btn-warning btn-sm me-2"
@@ -128,12 +164,11 @@ const Dashboard = () => {
                         setEditingProduct(p);
                         setForm({
                           title: p.title,
-                          price: p.price,
+                          price: String(p.price),
                           image: p.image,
                           details: p.details,
                         });
 
-                        // Scroll to top
                         scrollRef.current?.scrollTo({
                           top: 0,
                           behavior: "smooth",
@@ -155,6 +190,7 @@ const Dashboard = () => {
             ))
           )}
         </div>
+
       </div>
     </div>
   );
