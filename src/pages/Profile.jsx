@@ -1,71 +1,53 @@
-// Profile.jsx
+import { useOrders } from "../context/OrderContext";
 import { useAuth } from "../context/AuthContext";
-import { Navigate, Link } from "react-router-dom";
-import { FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Profile() {
-  const { user, logout } = useAuth();
+export default function UserOrders() {
+  const { orders } = useOrders();
+  const { user } = useAuth();
 
-  if (!user) return <Navigate to="/login" />;
+  // ✅ correct filter
+  const userOrders = orders.filter(
+    (o) => o.customer?.email === user?.email
+  );
 
-  const isAdmin = user.role === "admin";
+  if (!userOrders.length) {
+    return (
+      <h4 className="text-center mt-4">
+        You have no orders yet
+      </h4>
+    );
+  }
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      <div
-        className="card shadow-lg rounded-4"
-        style={{ maxWidth: "450px", width: "100%" }}
-      >
-        <div className="card-header bg-primary text-white text-center rounded-top-4 py-4">
-          <img
-            src="https://i.pravatar.cc/120"
-            alt="Profile"
-            className="rounded-circle mb-3 border border-white"
-            style={{ width: "100px", height: "100px" }}
-          />
-          <h4 className="mb-1">{user.name || "Client"}</h4>
-          <small className="text-light text-capitalize">{user.role}</small>
-        </div>
+    <div className="container mt-4">
+      <h3 className="mb-3">My Orders</h3>
 
-        <div className="card-body px-4 py-5">
-          <div className="mb-4">
-            <div className="d-flex justify-content-between mb-2">
-              <span className="fw-semibold">Email:</span>
-              <span>{user.email}</span>
-            </div>
-            <div className="d-flex justify-content-between mb-2">
-              <span className="fw-semibold">Name:</span>
-              <span>{user.name}</span>
-            </div>
-            <div className="d-flex justify-content-between">
-              <span className="fw-semibold">Role:</span>
-              <span className="text-capitalize">{user.role}</span>
-            </div>
+      {userOrders.map((o, index) => (
+        <div key={o.orderId} className="card mb-3 shadow-sm">
+          <div className="card-header d-flex justify-content-between">
+            <strong>Order #{index + 1}</strong>
+            <span className="badge bg-info">{o.orderStatus}</span>
           </div>
 
-          <div className="d-flex flex-column gap-3">
-            {/* Show My Orders only for regular users */}
-            {!isAdmin && (
-              <Link
-                to="/orders"
-                className="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center gap-2"
-              >
-                <FaShoppingCart /> My Orders
-              </Link>
-            )}
+          <div className="card-body">
+            <p><strong>Name:</strong> {o.customer.name}</p>
+            <p><strong>Email:</strong> {o.customer.email}</p>
+            <p><strong>Date:</strong> {new Date(o.createdAt).toLocaleString()}</p>
 
-            {/* Logout button is always visible */}
-            <button
-              className="btn btn-danger btn-lg d-flex align-items-center justify-content-center gap-2"
-              onClick={logout}
-            >
-              <FaSignOutAlt /> Logout
-            </button>
+            <hr />
+
+            <strong>Items:</strong>
+            {o.items.map((item) => (
+              <div key={item.productId}>
+                {item.title} × {item.quantity} = ₹{item.subtotal}
+              </div>
+            ))}
+
+            <hr />
+            <h5>Total: ₹{o.pricing.grandTotal}</h5>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 }
-  

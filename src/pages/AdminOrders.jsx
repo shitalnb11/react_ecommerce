@@ -5,78 +5,114 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export default function AdminOrders() {
   const { orders } = useOrders();
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "Pending":
-        return <span className="badge bg-warning text-dark">{status}</span>;
-      case "Processing":
-        return <span className="badge bg-primary">{status}</span>;
-      case "Delivered":
-        return <span className="badge bg-success">{status}</span>;
-      default:
-        return <span className="badge bg-secondary">{status}</span>;
-    }
-  };
-
-  const getPaymentBadge = (payment) => {
-    if (!payment) return <span className="badge bg-secondary">COD</span>;
-    return payment.status === "Paid" ? (
-      <span className="badge bg-success">{payment.method} - Paid</span>
-    ) : (
-      <span className="badge bg-warning text-dark">{payment.method} - Pending</span>
-    );
-  };
-
   if (!orders || orders.length === 0) {
     return (
       <div className="container mt-5 text-center">
         <h3>No orders yet 🛒</h3>
-        <p className="text-muted">Orders will appear here when customers place them.</p>
       </div>
     );
   }
 
+  const statusBadge = (status) => {
+    const map = {
+      Pending: "bg-warning text-dark",
+      Processing: "bg-primary",
+      Delivered: "bg-success",
+      Cancelled: "bg-danger",
+    };
+    return <span className={`badge ${map[status] || "bg-secondary"}`}>{status}</span>;
+  };
+
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-primary">Admin Orders Dashboard</h2>
-      <div className="table-responsive shadow-sm rounded">
-        <table className="table table-hover align-middle">
-          <thead className="table-dark sticky-top">
+    <div className="container-fluid mt-4">
+      <h2 className="mb-3 text-primary">Admin Orders Dashboard</h2>
+
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-dark text-center">
             <tr>
               <th>#</th>
+              <th>Order ID</th>
               <th>Customer</th>
-              <th>Email</th>
-              <th>Items</th>
+              <th>Products</th>
+              <th>Shipping Address</th>
+              <th>Payment</th>
               <th>Total</th>
               <th>Status</th>
-              <th>Payment</th>
               <th>Date</th>
             </tr>
           </thead>
+
           <tbody>
-            {orders.map((order, index) => (
-              <tr key={order.id}>
-                <td>{index + 1}</td>
-                <td>{order.customer?.name || order.userName || "N/A"}</td>
-                <td>{order.customer?.email || order.userEmail || "N/A"}</td>
+            {orders.map((o, index) => (
+              <tr key={o.id}>
+                <td className="text-center">{index + 1}</td>
+
                 <td>
-                  {(order.items || []).map((item) => (
-                    <div
-                      key={item.productId}
-                      className="p-1 mb-1 border rounded bg-light"
-                      style={{ fontSize: "0.9rem" }}
-                    >
-                      {item.title} × {item.quantity} <strong>₹{item.subtotal}</strong>
+                  <strong>{o.id}</strong>
+                  <br />
+                  <small>{o.userEmail}</small>
+                </td>
+
+                <td>
+                  {o.customer?.name || o.userName}
+                  <br />
+                  <small className="text-muted">
+                    {o.customer?.email || o.userEmail}
+                  </small>
+                </td>
+
+                {/* PRODUCTS */}
+                <td>
+                  {(o.products || o.items || []).map((item, i) => (
+                    <div key={i} className="border rounded p-1 mb-1 bg-light">
+                      {item.title} × {item.quantity || item.qty}
+                      <br />
+                      <small>₹{item.price}</small>
                     </div>
                   ))}
                 </td>
-                <td>
-                  ₹{order.pricing?.grandTotal ||
-                    (order.items || []).reduce((sum, i) => sum + i.subtotal, 0)}
+
+                {/* ADDRESS */}
+                <td style={{ fontSize: "0.9rem" }}>
+                  {o.address && <div>{o.address}</div>}
+
+                  {o.shippingAddress && (
+                    <>
+                      <div>{o.shippingAddress.line1}</div>
+                      <div>{o.shippingAddress.line2}</div>
+                      <div>
+                        {o.shippingAddress.city},{" "}
+                        {o.shippingAddress.state}
+                      </div>
+                      <div>{o.shippingAddress.postalCode}</div>
+                    </>
+                  )}
                 </td>
-                <td>{getStatusBadge(order.orderStatus || order.status || "Pending")}</td>
-                <td>{getPaymentBadge(order.payment)}</td>
-                <td>{new Date(order.date || order.createdAt).toLocaleString()}</td>
+
+                {/* PAYMENT */}
+                <td className="text-center">
+                  {o.payment?.method || "COD"}
+                  <br />
+                  <small className="text-muted">
+                    {o.payment?.status || "Pending"}
+                  </small>
+                </td>
+
+                {/* TOTAL */}
+                <td className="text-center">
+                  ₹{o.total || o.pricing?.grandTotal}
+                </td>
+
+                {/* STATUS */}
+                <td className="text-center">
+                  {statusBadge(o.orderStatus || o.status || "Pending")}
+                </td>
+
+                {/* DATE */}
+                <td className="text-center">
+                  {new Date(o.date || o.createdAt).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>
